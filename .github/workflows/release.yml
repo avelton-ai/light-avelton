@@ -55,7 +55,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         repository: storytold/craft-fonts
-        ref: abb83316d96aa59c1cf64784289e378fe9fa5695
+        ref: 8dcdacd5153e64560d109541a47d806f26f048c0
         path: craft-fonts
     - uses: actions/download-artifact@v4
       with:
@@ -318,7 +318,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         repository: storytold/craft-fonts
-        ref: abb83316d96aa59c1cf64784289e378fe9fa5695
+        ref: 8dcdacd5153e64560d109541a47d806f26f048c0
         path: craft-fonts
     - uses: dtolnay/rust-toolchain@stable
       with:
