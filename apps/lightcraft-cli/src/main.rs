@@ -1,15 +1,15 @@
-//! `lightcraft-cli`: headless Light Avelton.
+//! `light-avelton-cli`: headless Light Avelton.
 //!
 //! ```text
-//! lightcraft-cli run [--demo | --library DIR | --connect [ADDR]] [--import PATH]… CMD [key=value…]…
-//! lightcraft-cli mcp [--connect [ADDR]] [--demo] [--compact] [FILES/FOLDERS…]
-//! lightcraft-cli render <in> -o <out> [--set control=value]… [--settings FILE.json] [--preset ID] [--size N] [--quality Q]
-//! lightcraft-cli snapshot [--library DIR | --demo] [--script FILE.jsonl] [-o OUT.png] [--size WxH] [--scale S] [FILES…]
-//! lightcraft-cli merge hdr|panorama|hdr-panorama [OPTIONS] FILES…
-//! lightcraft-cli synth-merge hdr|panorama -o DIR
-//! lightcraft-cli commands [--json]
-//! lightcraft-cli controls [--json]
-//! lightcraft-cli calibrate [--max N] [--out DIR] FOLDERS/FILES…
+//! light-avelton-cli run [--demo | --library DIR | --connect [ADDR]] [--import PATH]… CMD [key=value…]…
+//! light-avelton-cli mcp [--connect [ADDR]] [--demo] [--compact] [FILES/FOLDERS…]
+//! light-avelton-cli render <in> -o <out> [--set control=value]… [--settings FILE.json] [--preset ID] [--size N] [--quality Q]
+//! light-avelton-cli snapshot [--library DIR | --demo] [--script FILE.jsonl] [-o OUT.png] [--size WxH] [--scale S] [FILES…]
+//! light-avelton-cli merge hdr|panorama|hdr-panorama [OPTIONS] FILES…
+//! light-avelton-cli synth-merge hdr|panorama -o DIR
+//! light-avelton-cli commands [--json]
+//! light-avelton-cli controls [--json]
+//! light-avelton-cli calibrate [--max N] [--out DIR] FOLDERS/FILES…
 //! ```
 #![forbid(unsafe_code)]
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
@@ -25,16 +25,16 @@ use lightcraft_mcp::{Backend, DEFAULT_ADDR, Headless, Remote, Server, expand_pat
 use serde_json::{Value, json};
 
 const USAGE: &str = "\
-lightcraft-cli — headless Light Avelton (photo library + raw developer)
+light-avelton-cli — headless Light Avelton (photo library + raw developer)
 
 USAGE:
-  lightcraft-cli run [OPTIONS] COMMAND [key=value | '{json}']… [COMMAND …]…
+  light-avelton-cli run [OPTIONS] COMMAND [key=value | '{json}']… [COMMAND …]…
       Run one or more commands (ids from `commands`, or control-protocol methods such as
       engine.commands / ui.inspect / ui.screenshot) and print one JSON line per command:
       {\"command\", \"ok\", \"result\" | \"error\", \"ms\"}. A word without `=` starts the next
       command; values are JSON when they parse (1, true, [1,2], {…}), else strings. Exit status
       is non-zero when a command fails. Example:
-        lightcraft-cli run --import ~/Photos/a.jpg develop.set control=light.exposure value=0.7 \\
+        light-avelton-cli run --import ~/Photos/a.jpg develop.set control=light.exposure value=0.7 \\
             develop.auto app.export path=/tmp/a.jpg longEdge=1600
       Options:
         --demo            headless, the procedural demo library
@@ -43,14 +43,14 @@ USAGE:
         --connect [ADDR]  drive the running app (`lightcraft --control 7980`; default 127.0.0.1:7980)
         --script FILE|-   also run JSON lines {\"command\": id, \"params\": {…}} (or {\"method\": …})
         --keep-going      continue after a failed command
-  lightcraft-cli mcp [OPTIONS] [FILES/FOLDERS…]
+  light-avelton-cli mcp [OPTIONS] [FILES/FOLDERS…]
       MCP server (JSON-RPC 2.0 over stdio). Headless by default: an in-process session with the
       given files imported. Options:
         --connect [ADDR]  drive a running app instead (`lightcraft --control 7980`; default 127.0.0.1:7980)
         --demo            headless: start with the procedurally generated demo library
         --library DIR     headless: open (or create) a persistent Light Avelton library; edits are saved
         --compact         list only the helper tools (every command stays reachable via run_command)
-  lightcraft-cli render <IN> -o <OUT> [OPTIONS]
+  light-avelton-cli render <IN> -o <OUT> [OPTIONS]
       Develop one file and export it (.jpg, .png, .tif, .webp, .avif or .dng by extension) with the
       same encoder as the app's Export dialog. Options:
         --set CONTROL=VALUE  set a develop slider, repeatable (e.g. --set light.exposure=0.5)
@@ -62,7 +62,7 @@ USAGE:
                              string), e.g. --opt colorSpace=displayP3 --opt bitDepth=16
                              --opt percent=50 --opt shortEdge=1080 --opt ppi=300
                              --opt format=original (copy + XMP sidecar) --opt metadata=none
-  lightcraft-cli snapshot [OPTIONS] [FILES/FOLDERS…]
+  light-avelton-cli snapshot [OPTIONS] [FILES/FOLDERS…]
       Run the full app UI headlessly (no window, no GPU: CPU-rasterized egui) and write PNGs.
       Options:
         --demo            the procedural demo library (default unless --library or FILES)
@@ -76,24 +76,24 @@ USAGE:
         -o, --output OUT  PNG path (a final screenshot is written here if the script took none)
         --size WxH        window size in points (default 1600x1000)
         --scale S         pixels per point (default 1)
-  lightcraft-cli merge hdr|panorama|hdr-panorama [OPTIONS] FILES…
+  light-avelton-cli merge hdr|panorama|hdr-panorama [OPTIONS] FILES…
       Photo Merge: writes <first>-HDR.dng / -Pano.dng / -HDR-Pano.dng next to the first file and
       prints the result as JSON. Options:
         --deghost none|low|medium|high   --no-align   --bracket N (HDR panorama)
         --projection auto|spherical|cylindrical|perspective   --boundary-warp 0..100
         --auto-crop   --fill-edges   --no-auto-settings
         --preview OUT.png   only render a ≤ 1024 px preview (nothing written next to the files)
-  lightcraft-cli synth-merge hdr|panorama -o DIR
+  light-avelton-cli synth-merge hdr|panorama -o DIR
       Write synthetic merge inputs (procedural scene; bracketed DNGs or overlapping PNG views).
-  lightcraft-cli commands [--json]   list every command id with its parameters
-  lightcraft-cli controls [--json]   list every develop control id with its range
-  lightcraft-cli calibrate [--max N] [--out DIR] FOLDERS/FILES…
+  light-avelton-cli commands [--json]   list every command id with its parameters
+  light-avelton-cli controls [--json]   list every develop control id with its range
+  light-avelton-cli calibrate [--max N] [--out DIR] FOLDERS/FILES…
       Fit a colour profile per camera model from raw files and their embedded camera JPEGs
       (Sony ARW, Nikon NEF, Fujifilm RAF): up to N files spread over the folders (default 300; 0 = all), pooled per
       model, written as <model>.json to DIR (default: the profiles folder Light Avelton reads,
       <config>/camera-profiles, or $LIGHTCRAFT_CAMERA_PROFILES). Raws of a profiled model then
       take their colour from the profile and only their tone from their own JPEG.
-  lightcraft-cli --version | --help
+  light-avelton-cli --version | --help
 ";
 
 #[cfg(feature = "dhat-heap")]
@@ -113,7 +113,7 @@ fn library_warnings(session: &mut Session, who: &str) {
 fn library_error(dir: &str, e: lightcraft_engine::EngineError) -> String {
     match e {
         lightcraft_engine::EngineError::LibraryInUse(why) => format!(
-            "{dir}: {why}\nTo work with the library while the app has it open, start the app with `--control PORT` and use `lightcraft-cli mcp --connect 127.0.0.1:PORT`."
+            "{dir}: {why}\nTo work with the library while the app has it open, start the app with `--control PORT` and use `light-avelton-cli mcp --connect 127.0.0.1:PORT`."
         ),
         e => format!("{dir}: {e}"),
     }
@@ -134,7 +134,7 @@ fn main() -> ExitCode {
     alloc_release::install();
     // Warnings (a GPU render redone on the CPU, an unknown backend name) on stderr; LIGHTCRAFT_LOG
     // or RUST_LOG picks another level (#168).
-    lightcraft_engine::logging::install("lightcraft-cli");
+    lightcraft_engine::logging::install("light-avelton-cli");
     let args: Vec<String> = std::env::args().skip(1).collect();
     let r = match args.first().map(String::as_str) {
         Some("run") => run(&args[1..]),
@@ -147,7 +147,7 @@ fn main() -> ExitCode {
         Some("controls") => controls(&args[1..]),
         Some("calibrate") => calibrate(&args[1..]),
         Some("--version" | "-V" | "version") => {
-            println!("lightcraft-cli {}", env!("CARGO_PKG_VERSION"));
+            println!("light-avelton-cli {}", env!("CARGO_PKG_VERSION"));
             Ok(())
         }
         Some("--help" | "-h" | "help") | None => {
@@ -159,7 +159,7 @@ fn main() -> ExitCode {
     match r {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("lightcraft-cli: {e}");
+            eprintln!("light-avelton-cli: {e}");
             ExitCode::FAILURE
         }
     }
@@ -310,11 +310,11 @@ fn mcp(args: &[String]) -> Result<(), String> {
             }
             match Remote::connect(&addr) {
                 Ok(r) => {
-                    eprintln!("lightcraft-cli mcp: connected to Light Avelton at {addr}");
+                    eprintln!("light-avelton-cli mcp: connected to Light Avelton at {addr}");
                     Box::new(r)
                 }
                 Err(e) => {
-                    eprintln!("lightcraft-cli mcp: Light Avelton is not reachable at {addr} yet ({e}); will retry on each call");
+                    eprintln!("light-avelton-cli mcp: Light Avelton is not reachable at {addr} yet ({e}); will retry on each call");
                     Box::new(Remote::lazy(&addr))
                 }
             }
@@ -324,8 +324,8 @@ fn mcp(args: &[String]) -> Result<(), String> {
                 Some(dir) => {
                     let mut h = Headless::default();
                     let r = h.session.open_library(dir, demo).map_err(|e| library_error(dir, e))?;
-                    eprintln!("lightcraft-cli mcp: opened library {dir} ({r:?})");
-                    library_warnings(&mut h.session, "lightcraft-cli mcp");
+                    eprintln!("light-avelton-cli mcp: opened library {dir} ({r:?})");
+                    library_warnings(&mut h.session, "light-avelton-cli mcp");
                     h
                 }
                 None if demo => Headless::demo(),
@@ -334,12 +334,12 @@ fn mcp(args: &[String]) -> Result<(), String> {
             if !files.is_empty() {
                 let paths = expand_paths(&files);
                 let r = h.session.execute("library.import", &json!({"paths": paths})).map_err(|e| e.to_string())?;
-                eprintln!("lightcraft-cli mcp: imported {} photo(s)", r["imported"].as_array().map_or(0, Vec::len));
+                eprintln!("light-avelton-cli mcp: imported {} photo(s)", r["imported"].as_array().map_or(0, Vec::len));
             }
             Box::new(h)
         }
     };
-    eprintln!("lightcraft-cli mcp: serving MCP on stdio ({})", backend.describe());
+    eprintln!("light-avelton-cli mcp: serving MCP on stdio ({})", backend.describe());
     let mut server = Server::new(backend).with_command_tools(!compact);
     let stdin = std::io::stdin();
     server.serve(BufReader::new(stdin), std::io::stdout()).map_err(|e| e.to_string())
@@ -455,7 +455,7 @@ fn synth_merge(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-/// One step of `lightcraft-cli run`: a command id (or control-protocol method) and its params.
+/// One step of `light-avelton-cli run`: a command id (or control-protocol method) and its params.
 #[derive(Debug, PartialEq)]
 struct Step {
     id: String,
@@ -545,7 +545,7 @@ fn run(args: &[String]) -> Result<(), String> {
         }
     }
     if steps.is_empty() {
-        return Err("run: no command given (see `lightcraft-cli commands`)".into());
+        return Err("run: no command given (see `light-avelton-cli commands`)".into());
     }
     let mut backend: Box<dyn Backend> = match connect {
         Some(addr) => {
@@ -561,7 +561,7 @@ fn run(args: &[String]) -> Result<(), String> {
                 Some(dir) => {
                     let mut h = Headless::default();
                     h.session.open_library(dir, demo).map_err(|e| library_error(dir, e))?;
-                    library_warnings(&mut h.session, "lightcraft-cli");
+                    library_warnings(&mut h.session, "light-avelton-cli");
                     h
                 }
                 None if demo => Headless::demo(),
@@ -691,9 +691,9 @@ fn render(args: &[String]) -> Result<(), String> {
     lightcraft_engine::export::write_file(&output, &e.bytes)?;
     for (sc, bytes) in &sidecars {
         lightcraft_engine::export::write_file(sc, bytes)?;
-        eprintln!("lightcraft-cli: wrote {sc}");
+        eprintln!("light-avelton-cli: wrote {sc}");
     }
-    eprintln!("lightcraft-cli: wrote {output} ({}×{})", e.width, e.height);
+    eprintln!("light-avelton-cli: wrote {output} ({}×{})", e.width, e.height);
     Ok(())
 }
 
@@ -744,7 +744,7 @@ fn snapshot(args: &[String]) -> Result<(), String> {
         let ti = Instant::now();
         let r = session.execute("library.import", &json!({"paths": expand_paths(&files)})).map_err(|e| e.to_string())?;
         let n = r["imported"].as_array().map_or(0, Vec::len);
-        eprintln!("lightcraft-cli snapshot: imported {n} files in {:.0} ms", ti.elapsed().as_secs_f64() * 1e3);
+        eprintln!("light-avelton-cli snapshot: imported {n} files in {:.0} ms", ti.elapsed().as_secs_f64() * 1e3);
     }
     let services = lightcraft_ui_egui::Services {
         write_shared: Some(std::sync::Arc::new(lightcraft_engine::export::write_file)),
@@ -821,7 +821,7 @@ fn snapshot(args: &[String]) -> Result<(), String> {
             writeln!(out, "{reply}").map_err(|e| e.to_string())?;
             if method == "ui.screenshot" {
                 eprintln!(
-                    "lightcraft-cli snapshot: {} ({:.0} ms)",
+                    "light-avelton-cli snapshot: {} ({:.0} ms)",
                     reply["result"]["path"].as_str().unwrap_or("?"),
                     ts.elapsed().as_secs_f64() * 1000.0
                 );
@@ -836,18 +836,18 @@ fn snapshot(args: &[String]) -> Result<(), String> {
         if r["ok"] != true {
             return Err(format!("screenshot failed: {}", r["error"]));
         }
-        eprintln!("lightcraft-cli snapshot: wrote {path} ({}×{})", r["result"]["width"], r["result"]["height"]);
+        eprintln!("light-avelton-cli snapshot: wrote {path} ({}×{})", r["result"]["width"], r["result"]["height"]);
     }
     // a background export started by the script finishes before we exit (its files would be cut off)
     if h.app.export.is_some() {
-        eprintln!("lightcraft-cli snapshot: waiting for the background export");
+        eprintln!("light-avelton-cli snapshot: waiting for the background export");
         let te = std::time::Instant::now();
         while h.app.export.is_some() && te.elapsed() < std::time::Duration::from_secs(3600) {
             h.step();
             std::thread::sleep(std::time::Duration::from_millis(20));
         }
     }
-    eprintln!("lightcraft-cli snapshot: done in {:.2} s ({} frames)", t0.elapsed().as_secs_f64(), h.frames());
+    eprintln!("light-avelton-cli snapshot: done in {:.2} s ({} frames)", t0.elapsed().as_secs_f64(), h.frames());
     if failed > 0 { Err(format!("{failed} scripted request(s) failed")) } else { Ok(()) }
 }
 

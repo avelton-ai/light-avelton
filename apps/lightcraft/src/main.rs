@@ -684,7 +684,7 @@ fn main() -> eframe::Result {
             "--no-demo" => seed_demo = false,
             "--memory" | "--demo" => in_memory = true,
             "--version" => {
-                println!("lightcraft {}", env!("CARGO_PKG_VERSION"));
+                println!("light-avelton {}", env!("CARGO_PKG_VERSION"));
                 return Ok(());
             }
             "-h" | "--help" => {
