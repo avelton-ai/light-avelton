@@ -1,6 +1,6 @@
-# LightCraft MCP server
+# Light Avelton MCP server
 
-`lightcraft-cli mcp` exposes LightCraft to AI agents through the
+`lightcraft-cli mcp` exposes Light Avelton to AI agents through the
 [Model Context Protocol](https://modelcontextprotocol.io): newline-delimited JSON-RPC 2.0 over
 stdio (protocol revision `2025-06-18`; `2025-03-26` and `2024-11-05` clients are accepted). The
 server lives in `crates/mcp` (`lightcraft-mcp`, layer L5) and is hand-written: no async runtime,
@@ -13,11 +13,11 @@ It runs in one of two modes:
 | **Headless** (default) | `lightcraft-cli mcp [--demo] [FILES/FOLDERS…]` | An in-process engine `Session`. Develop, render and export without a window. |
 | **Connect** | `lightcraft-cli mcp --connect [127.0.0.1:7980]` | A running desktop app started with `lightcraft --control 7980`, through its loopback JSON-lines control channel ([control-protocol.md](control-protocol.md)). Adds the UI tools (screenshot, clicks, keys, pointer gestures). |
 
-Options: `--library DIR` opens (or creates) a persistent LightCraft library — the same crash-safe
-format the desktop app uses (`~/Pictures/LightCraft Library` by default there) — so ratings, edits and albums
+Options: `--library DIR` opens (or creates) a persistent Light Avelton library — the same crash-safe
+format the desktop app uses (`~/Pictures/Light Avelton Library` by default there) — so ratings, edits and albums
 survive between sessions (with `--demo`, a new library is seeded with the demo photos). A library
 is open in one program at a time (`catalog.lock` in the library folder): while the desktop app has
-it open, `--library` on the same folder fails with "This library is already open in LightCraft
+it open, `--library` on the same folder fails with "This library is already open in Light Avelton
 (process N …)" — use connect mode to work with the running app instead;
 `--demo` starts the headless session with the procedurally generated demo library;
 `--compact` lists only the helper tools (see below). In connect mode the server starts even when
@@ -65,7 +65,7 @@ Register the CLI's stdio server with Codex using its **absolute** installed path
 codex mcp add lightcraft -- "/absolute/path/lightcraft-cli" mcp --library "/absolute/path/library"
 
 # Live desktop: start the app on the matching loopback port first.
-"/absolute/path/LightCraft.app/Contents/MacOS/LightCraft" --library "/absolute/path/library" --control 7980
+"/absolute/path/Light Avelton.app/Contents/MacOS/Light Avelton" --library "/absolute/path/library" --control 7980
 codex mcp add lightcraft-app -- "/absolute/path/lightcraft-cli" mcp --connect 127.0.0.1:7980
 ```
 
@@ -88,13 +88,13 @@ The release packages ship `lightcraft-cli` alongside the desktop app, so no buil
 
 | Install | CLI |
 |---|---|
-| Windows (MSI) | `C:\Program Files\LightCraft\lightcraft-cli.exe` by default (wherever you installed it otherwise), not on `PATH` |
+| Windows (MSI) | `C:\Program Files\Light Avelton\lightcraft-cli.exe` by default (wherever you installed it otherwise), not on `PATH` |
 | Linux (deb, rpm) | `/usr/bin/lightcraft-cli` |
 | macOS | the separate `lightcraft-cli-<version>-macos-<arch>.zip` release asset (the `.app` holds only the desktop app) |
 
 ```sh
 # Windows, default install folder
-claude mcp add lightcraft -- "C:\Program Files\LightCraft\lightcraft-cli.exe" mcp
+claude mcp add lightcraft -- "C:\Program Files\Light Avelton\lightcraft-cli.exe" mcp
 # Linux, or macOS with the CLI unzipped onto PATH
 claude mcp add lightcraft -- lightcraft-cli mcp
 ```
@@ -120,7 +120,7 @@ During development you can also point the client at `cargo run --release -p ligh
 
 ## Shared core tools
 
-These follow the same conventions as [filmcraft #28](https://github.com/storytold/filmcraft/pull/28).
+These follow the same conventions as [filmcraft #28](https://github.com/avelton-ai/film-avelton/pull/28).
 They are listed in both full and compact mode; existing documented helpers remain listed too.
 There are no hidden compatibility aliases.
 
@@ -188,7 +188,7 @@ In headless mode these return a tool error explaining how to start the app.
 
 ### One tool per command
 
-Everything is a command in LightCraft, so `tools/list` also contains one tool per entry of the
+Everything is a command in Light Avelton, so `tools/list` also contains one tool per entry of the
 command registry (engine commands, plus the app's UI commands such as `view.detail` when
 connected): the id with `.` replaced by `_` and a `cmd_` prefix — `photo.rate` → `cmd_photo_rate`,
 `develop.set` → `cmd_develop_set`, `edit.undo` → `cmd_edit_undo`. Arguments are the command's
@@ -226,7 +226,7 @@ standard error codes (-32700 parse, -32600 invalid request, -32601 method not fo
 invalid params, -32002 resource not found).
 
 With `--library`, a command whose change can't be written to disk (disk full, …) is an error too:
-`saved in memory but not written to disk: <reason>; LightCraft will retry` — the change is applied in the session and
+`saved in memory but not written to disk: <reason>; Light Avelton will retry` — the change is applied in the session and
 written by the next successful save (see [control-protocol.md](control-protocol.md#when-the-library-cant-be-saved)).
 
 ## One-shot commands: `lightcraft-cli run`

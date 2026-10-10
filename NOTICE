@@ -41,3 +41,10 @@ also embed the fonts listed in https://github.com/storytold/craft-fonts/blob/mai
 (the Japanese fonts BIZ UDPGothic, BIZ UDMincho and Shippori Mincho; the web build embeds only BIZ
 UDPGothic Regular), under the SIL Open Font License 1.1. Release packages include each font's
 licence as OFL-<family>.txt.
+
+Avelton distribution
+Based on LightCraft, https://github.com/storytold/lightcraft, commit 543695129932c92338186911405ef26444c5a1c6.
+Original source copyrights and licences above are retained.
+Original Avelton geometric artwork: copyright 2026 Avelton contributors, MIT OR Apache-2.0.
+Inter lettering: OFL-1.1, see the bundled Inter font licence.
+Avelton is independently maintained; no endorsement by the upstream authors is implied.
