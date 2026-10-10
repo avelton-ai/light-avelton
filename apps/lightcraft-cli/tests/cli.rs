@@ -455,7 +455,9 @@ fn a_library_open_in_another_process_is_refused() {
     }
     let (ok, _, stderr) = run_cli(&["--library", lib_s, "library.info"], None);
     assert!(!ok);
-    assert!(stderr.contains("already open in light-avelton-cli") && stderr.contains(&format!("process {}", holder.id())), "{stderr}");
+    // Cargo keeps the internal executable name; installed binaries use the Avelton name.
+    let holder_name = std::path::Path::new(BIN).file_stem().unwrap().to_string_lossy();
+    assert!(stderr.contains(&format!("already open in {holder_name}")) && stderr.contains(&format!("process {}", holder.id())), "{stderr}");
     assert!(stderr.contains("mcp --connect"), "{stderr}");
 
     drop(holder.stdin.take()); // EOF: the server exits and lets go of the library
