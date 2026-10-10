@@ -1,6 +1,6 @@
-# LightCraft em português do Brasil
+# Light Avelton em português do Brasil
 
-O LightCraft pode ser exibido em inglês, chinês simplificado, chinês tradicional (Taiwan), japonês e
+O Light Avelton pode ser exibido em inglês, chinês simplificado, chinês tradicional (Taiwan), japonês e
 português do Brasil. A preferência de idioma é gravada em `language` no `ui.json`.
 
 - Troque em **Editar → Idioma** ou em **Configurações → Geral → Idioma**. A escolha é mantida nas

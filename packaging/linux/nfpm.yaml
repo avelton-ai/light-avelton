@@ -3,7 +3,7 @@
 # exports VERSION and NFPM_ARCH.
 #
 #   nfpm package -f packaging/linux/nfpm.yaml -p deb -t dist/release/
-name: lightcraft
+name: light-avelton
 arch: ${NFPM_ARCH}
 platform: linux
 version: ${VERSION}
@@ -13,8 +13,8 @@ release: 1
 section: graphics
 priority: optional
 maintainer: ${LIGHTCRAFT_MAINTAINER}
-vendor: Learning Machines LLC
-homepage: https://getartcraft.com/apps/lightcraft
+vendor: Avelton
+homepage: https://light.avelton.online
 license: MIT OR Apache-2.0
 description: |-
   Open-source, native photo library and raw developer that works the way
@@ -56,11 +56,11 @@ overrides:
       - xdg-desktop-portal
 
 contents:
-  - src: ${STAGE}/usr/bin/lightcraft
-    dst: /usr/bin/lightcraft
+  - src: ${STAGE}/usr/bin/light-avelton
+    dst: /usr/bin/light-avelton
     file_info: { mode: 0755 }
-  - src: ${STAGE}/usr/bin/lightcraft-cli
-    dst: /usr/bin/lightcraft-cli
+  - src: ${STAGE}/usr/bin/light-avelton-cli
+    dst: /usr/bin/light-avelton-cli
     file_info: { mode: 0755 }
   - src: ${STAGE}/usr/share/
     dst: /usr/share/

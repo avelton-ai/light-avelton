@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  LightCraft MSI (WiX Toolset v5: `dotnet tool install -g wix`, plus the UI and Util extensions:
+  Light Avelton MSI (WiX Toolset v5: `dotnet tool install -g wix`, plus the UI and Util extensions:
   `wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2`). Built by package.ps1:
 
     wix build lightcraft.wxs -arch x64 -ext WixToolset.UI.wixext/5.0.2 -ext WixToolset.Util.wixext/5.0.2
       -d Version=1.2.3 -d BinDir=... -d IconPath=... -d UiDialogBmp=... -d UiBannerBmp=... -o out.msi
 
   Per-machine install into Program Files (or the folder chosen in the installer, or
-  `INSTALLFOLDER=...` on the msiexec command line; upgrades keep it), a Start Menu shortcut, `.pcraft` owned by LightCraft,
-  and LightCraft offered under "Open with" for PSD/PSB and the image formats it reads (without
+  `INSTALLFOLDER=...` on the msiexec command line; upgrades keep it), a Start Menu shortcut, `.pcraft` owned by Light Avelton,
+  and Light Avelton offered under "Open with" for PSD/PSB and the image formats it reads (without
   taking over the user's default app for them).
 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package
-      Name="LightCraft"
-      Manufacturer="Learning Machines LLC"
+      Name="Light Avelton"
+      Manufacturer="Avelton"
       Version="$(var.Version)"
-      UpgradeCode="229BB552-5EFD-479A-BA86-8CB6D926390C"
+      UpgradeCode="E40B06D7-3A4A-54A9-9A88-EEF6F0FAB71B"
       Scope="perMachine"
       Compressed="yes"
       Language="1033">
-    <SummaryInformation Description="LightCraft photo library and raw developer" Manufacturer="Learning Machines LLC" />
+    <SummaryInformation Description="Light Avelton photo library and raw developer" Manufacturer="Avelton" />
     <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
          (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
-        DowngradeErrorMessage="A newer version of LightCraft is already installed." />
+        DowngradeErrorMessage="A newer version of Light Avelton is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <Icon Id="LightcraftIcon.ico" SourceFile="$(var.IconPath)" />
     <Property Id="ARPPRODUCTICON" Value="LightcraftIcon.ico" />
-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/lightcraft" />
-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/lightcraft" />
-    <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
+    <Property Id="ARPURLINFOABOUT" Value="https://light.avelton.online" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://light.avelton.online" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/avelton-ai/light-avelton/issues" />
 
     <StandardDirectory Id="ProgramFiles6432Folder">
-      <Directory Id="INSTALLFOLDER" Name="LightCraft" />
+      <Directory Id="INSTALLFOLDER" Name="Light Avelton" />
     </StandardDirectory>
     <!-- The folder of the installed version (written by LightcraftApp), so an upgrade installs
          where the user chose instead of moving back to Program Files (issue #399). Searched into
          its own property: AppSearch would otherwise overwrite INSTALLFOLDER=... given to msiexec. -->
     <Property Id="PREVIOUSINSTALLFOLDER">
-      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\LightCraft" Name="InstallFolder" Type="raw" />
+      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\Light Avelton" Name="InstallFolder" Type="raw" />
     </Property>
     <SetProperty Id="INSTALLFOLDER" Value="[PREVIOUSINSTALLFOLDER]" After="AppSearch" Sequence="both"
         Condition="PREVIOUSINSTALLFOLDER AND NOT INSTALLFOLDER" />
     <StandardDirectory Id="ProgramMenuFolder" />
 
-    <Feature Id="Main" Title="LightCraft" Level="1">
+    <Feature Id="Main" Title="Light Avelton" Level="1">
       <ComponentGroupRef Id="LightcraftFiles" />
     </Feature>
 
@@ -55,14 +55,14 @@
 
   <!--
     Interactive install UI: Welcome -> Destination Folder -> Ready to install -> progress ->
-    "Completed" (Finish), with a "Launch LightCraft" checkbox (checked by default). Destination
-    Folder (issue #399) shows Program Files\LightCraft, or the installed version's folder on an
+    "Completed" (Finish), with a "Launch Light Avelton" checkbox (checked by default). Destination
+    Folder (issue #399) shows Program Files\Light Avelton, or the installed version's folder on an
     upgrade; Change... browses, and a folder that can't be used (InvalidDirDlg) is refused before
     anything is installed. Failure and cancellation end on WiX's standard FatalError / UserExit
     dialogs instead of the completion page. Maintenance (running the MSI again, Repair/Remove from
     Apps) uses the standard maintenance dialogs.
 
-    This is WixUI_InstallDir without its licence-acceptance page: LightCraft is MIT OR Apache-2.0,
+    This is WixUI_InstallDir without its licence-acceptance page: Light Avelton is MIT OR Apache-2.0,
     which ask nothing of people who just install and run it, so a click-through EULA would only
     add a step. Silent (/qn) and basic-UI (/passive, /qb) installs never show these dialogs, so
     they are unaffected, and nothing is launched.
@@ -75,11 +75,11 @@
     <WixVariable Id="WixUIBannerBmp" Value="$(var.UiBannerBmp)" />
 
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
-        Value="LightCraft has been installed. You can start it at any time from the Start menu." />
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch LightCraft" />
+        Value="Light Avelton has been installed. You can start it at any time from the Start menu." />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Light Avelton" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
-    <!-- "Launch LightCraft" on Finish. WixUnelevatedShellExec (Util extension) asks the desktop
+    <!-- "Launch Light Avelton" on Finish. WixUnelevatedShellExec (Util extension) asks the desktop
          shell (Explorer) to start the program, so it runs as the signed-in user at normal
          integrity even when the installer UI itself is elevated (e.g. msiexec started from an
          admin prompt); it never runs from the elevated/SYSTEM server side. It is a UI-only control
@@ -165,19 +165,24 @@
 
   <Fragment>
     <ComponentGroup Id="LightcraftFiles" Directory="INSTALLFOLDER">
-      <Component Id="LightcraftApp" Guid="8A1D3A39-F7C1-47B1-97AE-40C80BF82F4A">
-        <File Id="LightcraftExe" Source="$(var.BinDir)\lightcraft.exe" KeyPath="yes">
-          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="LightCraft"
-              Description="LightCraft photo library and raw developer" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
+      <Component Id="LightcraftApp" Guid="A93146A2-4610-55D7-80CA-D8FBA28008FF">
+        <File Id="LightcraftExe" Source="$(var.BinDir)\light-avelton.exe" KeyPath="yes">
+          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="Light Avelton"
+              Description="Light Avelton photo library and raw developer" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
               Icon="LightcraftIcon.ico" IconIndex="0" />
         </File>
 
-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\lightcraft.exe" Value="[#LightcraftExe]" Type="string" />
-        <RegistryValue Root="HKLM" Key="Software\LightCraft" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\light-avelton.exe" Value="[#LightcraftExe]" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Light Avelton" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" />
       </Component>
 
       <Component Id="LightcraftCli">
-        <File Id="LightcraftCliExe" Source="$(var.BinDir)\lightcraft-cli.exe" KeyPath="yes" />
+        <File Id="LightcraftCliExe" Source="$(var.BinDir)\light-avelton-cli.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="AveltonNotices" Guid="286E2E82-3014-5AD1-8C4F-791C4306B4DA">
+        <File Id="AveltonNotice0" Source="$(sys.SOURCEFILEDIR)..\..\NOTICE" />
+        <File Id="AveltonNotice1" Source="$(sys.SOURCEFILEDIR)..\..\avelton.json" />
+        <File Id="AveltonNotice2" Source="$(sys.SOURCEFILEDIR)..\..\assets\fonts\OFL-Inter.txt" />
       </Component>
     </ComponentGroup>
   </Fragment>

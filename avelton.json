@@ -1,0 +1,16 @@
+{
+  "name": "Light Avelton",
+  "slug": "light-avelton",
+  "domain": "light.avelton.online",
+  "app_id": "online.avelton.light",
+  "version": "0.5.0-avelton.1",
+  "upstream": {
+    "repository": "storytold/lightcraft",
+    "commit": "543695129932c92338186911405ef26444c5a1c6",
+    "installer_upgrade_code": "229BB552-5EFD-479A-BA86-8CB6D926390C"
+  },
+  "release": {
+    "unsigned": true,
+    "channel": "alpha"
+  }
+}
